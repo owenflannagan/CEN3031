@@ -7,7 +7,16 @@ var http = require('http'),
 var listingData, server;
 
 var requestHandler = function(request, response) {
-  var parsedUrl = url.parse(request.url);
+	var parsedUrl = url.parse(request.url);
+	
+	if (parsedUrl.path == "/listings") {
+		response.statusCode = 200;
+		response.end(listingData);
+	} else {
+		response.statusCode = 404;
+		response.end("Bad gateway error");
+	}
+
 
   /*
     Your request handler should send listingData in the JSON format as a response if a GET request 
@@ -38,14 +47,18 @@ fs.readFile('listings.json', 'utf8', function(err, data) {
    */
 
     //Check for errors
+	if (err) throw err;
   
 
-   //Save the sate in the listingData variable already defined
-  
+   //Save the state in the listingData variable already defined
+	listingData = data;
 
   //Creates the server
+	server = http.createServer(requestHandler);
   
   //Start the server
-
+	server.listen(port, function() {
+		console.log("Server listening on: http://127.0.0.1:" + port);
+	});
 
 });
